@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 00:14:08 by avast             #+#    #+#             */
-/*   Updated: 2023/01/26 01:56:27 by avast            ###   ########.fr       */
+/*   Updated: 2023/01/25 13:16:48 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	heredoc(char *limiter, int argc)
 
 	p.a = pipe(p.pfd);
 	if (p.a == -1)
-		return (ft_putstr_fd(" failed\n", 2), -1);
+		return (ft_putstr_fd("pipe failed\n", 2), -1);
 	new_limiter = ft_strjoin(limiter, "\n");
 	infile = 0;
 	while (1)

@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 01:56:32 by avast             #+#    #+#             */
-/*   Updated: 2023/01/26 02:19:46 by avast            ###   ########.fr       */
+/*   Updated: 2023/01/26 18:05:16 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,12 +49,12 @@ int	check_path(void)
 	nb_va = 0;
 	while (environ[nb_va])
 		nb_va++;
-	path = 0;
 	while (environ[path] && !ft_strnstr(environ[path], "PATH=", 5))
 		path++;
 	if (path == nb_va)
 		return (0);
 	return (1);
+
 }
 
 char	*get_command_path(char *cmd)
@@ -94,15 +94,16 @@ int	execute_command(char *full_cmd)
 		return (ft_putstr_fd("split failed\n", 2), -1);
 	path = get_command_path(cmd[0]);
 	if (!path)
-		return (error_msg(cmd[0], NO_COMMAND), free_tab(cmd, -1), -1);
+		return (error_msg(cmd[0], NO_COMMAND), free_tab(cmd, -1), NO_COMMAND);
 	f.pid = fork();
 	if (f.pid == -1)
 		return (ft_putstr_fd("fork failed\n", 2), -1);
 	else if (f.pid == 0)
 	{
-		execve(path, cmd, environ);
-		ft_putstr_fd("execve failed\n", 2);
+		if (execve(path, cmd, environ))
+			return (ft_putstr_fd("execve failed\n", 2), -1);
 	}
-	wait(&f.status);
+	else
+		waitpid(f.pid, &f.status, 0);
 	return (free(path), free_tab(cmd, -1), 0);
 }

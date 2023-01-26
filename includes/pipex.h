@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:45 by avast             #+#    #+#             */
-/*   Updated: 2023/01/26 01:30:22 by avast            ###   ########.fr       */
+/*   Updated: 2023/01/26 15:35:21 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,6 @@ char	*get_command_path(char *command);
 int		get_infile_fd(int argc, char **argv);
 int		get_outfile_fd(int argc, char **argv);
 int		heredoc(char *limiter, int argc);
-int		redirect_command(char *cmd1, char *cmd2);
-int		pipex(char *cmd);
+int		redirect_command(char *cmd);
+int		pipex(int argc, char **argv, int infile, int outfile);
 #endif
