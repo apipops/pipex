@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:15 by avast             #+#    #+#             */
-/*   Updated: 2023/01/26 02:16:14 by avast            ###   ########.fr       */
+/*   Updated: 2023/01/26 02:33:06 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ int	main(int argc, char **argv)
 	if (dup2(infile, 0) < 0)
 		return (ft_putstr_fd("dup2 failed\n", 2), -1);
 	close(infile);
-	while (i < argc - 3)
+	while (i < argc - 2)
 		pipex(argv[i++]);
 	if (dup2(outfile, 1) < 0)
 		return (ft_putstr_fd("dup2 failed\n", 2), -1);
