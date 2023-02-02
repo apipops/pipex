@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/11/08 15:33:57 by avast             #+#    #+#             */
-/*   Updated: 2022/11/08 15:43:49 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/02 18:19:18 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ char	*ft_strdup(const char *s)
 	char	*dest;
 	int		i;
 
+	if (s == 0)
+		return (NULL);
 	dest = (char *)malloc (sizeof(char) * (ft_strlen(s) + 1));
 	if (!dest)
 		return (0);

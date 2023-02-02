@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 09:47:25 by avast             #+#    #+#             */
-/*   Updated: 2023/02/02 10:05:28 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/02 18:23:03 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,7 @@ void	wait_all_pids(t_cmd **list)
 	while (cur->next)
 	{
 		waitpid(cur->pid, NULL, WUNTRACED);
+		printf("%s : error = %d\n", cur->name, cur->error);
 		shell_error_msg(cur->name, cur->error);
 		cur = cur->next;
 	}
