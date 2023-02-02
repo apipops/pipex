@@ -6,12 +6,29 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/20 13:06:31 by avast             #+#    #+#             */
-/*   Updated: 2023/01/25 12:35:20 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/02 10:04:04 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 #include "../libft/libft.h"
+
+int	check_environment(void)
+{
+	int	i;
+
+	if (!environ)
+		return (ft_putstr_fd("environment error: no environment\n", 2), -1);
+	i = 0;
+	while (environ[i])
+	{
+		if (ft_strstr("SHELL=\0", environ[i]))
+			return (0);
+		else
+			i++;
+	}
+	return (-1);
+}
 
 void	free_tab(char **tab, int index)
 {
@@ -37,20 +54,62 @@ void	free_tab(char **tab, int index)
 	free(tab);
 }
 
-void	error_msg(char *cmd, int type)
+int	error_msg(int type)
+{
+	if (type == ENV)
+		return (-1);
+	if (type == ARG)
+		ft_putstr_fd("too few arguments\n", 2);
+	if (type == PIPE)
+		ft_putstr_fd("pipe failed\n", 2);
+	if (type == FORK)
+		ft_putstr_fd("fork failed\n", 2);
+	if (type == MALLOC)
+		ft_putstr_fd("malloc failed\n", 2);
+	return (-1);
+}
+
+int	shell_error_msg(char *cmd, int type)
 {
 	int	i;
 
 	i = 0;
-	while (environ[i] && !ft_strnstr(environ[i], "SHELL=/bin/", 11))
+	if (type == NO_ERROR)
+		return (0);
+	if (type == FILE_CREATION)
+	{
+		ft_putstr_fd("file creation failed: ", 2),
+		ft_putstr_fd(cmd, 2);
+		ft_putstr_fd("\n", 2);
+		return (-1);
+	}
+	while (environ[i] && !ft_strstr("SHELL=/bin/\0", environ[i]))
 		i++;
 	ft_putstr_fd(environ[i] + 11, 2);
 	if (type == NO_COMMAND)
 		ft_putstr_fd(": command not found: ", 2);
-	else if (type == NO_FILE)
+	if (type == NO_FILE)
 		ft_putstr_fd(": no such file or directory: ", 2);
-	else
+	if (type == PERMISSION_DENIED)
 		ft_putstr_fd(": permission denied: ", 2);
 	ft_putstr_fd(cmd, 2);
 	ft_putstr_fd("\n", 2);
+	return (-1);
+}
+
+int	exit_command(char *path, char **arg)
+{
+	if (path == 0)
+	{
+		//shell_error_msg(arg[0], NO_COMMAND);
+		free_tab(arg, -1);
+		exit (127);
+	}
+	else
+	{
+		//shell_error_msg(arg[0], PERMISSION_DENIED);
+		free_tab(arg, -1);
+		free(path);
+		exit (126);
+	}
 }
