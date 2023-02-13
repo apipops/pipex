@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:15 by avast             #+#    #+#             */
-/*   Updated: 2023/02/02 10:05:59 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/13 18:26:32 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ int	main(int argc, char **argv)
 	int		status;
 	t_cmd	*list;
 
-	status = 0;
+	list = NULL;
 	if (check_environment() < 0)
 		return (-1);
 	if (argc < 5)
@@ -27,7 +27,7 @@ int	main(int argc, char **argv)
 	files[INFILE] = get_infile_fd(argc, argv);
 	files[OUTFILE] = get_outfile_fd(argc, argv);
 	pipex(argc, argv, files, &list);
-	wait_all_pids(&list);
+	status = wait_all_pids(&list, files[OUTFILE]);
 	list_free_cmd(&list);
 	if (files[OUTFILE] == PERMISSION_DENIED)
 		shell_error_msg(argv[argc - 1], PERMISSION_DENIED);

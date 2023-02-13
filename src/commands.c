@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 01:56:32 by avast             #+#    #+#             */
-/*   Updated: 2023/02/02 10:15:01 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/13 18:29:10 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,13 +38,12 @@
 	return (free_tab(arg, -1), 0);
 } */
 
-int	execute_command(char *full_cmd, t_cmd **list, int outfile)
+int	execute_command(char *full_cmd, t_cmd **list)
 {
 	char	**arg;
 	char	*path;
 	pid_t	pid;
 
-	(void)outfile;
 	arg = ft_split(full_cmd, 32);
 	if (!arg)
 		return (error_msg(MALLOC));
@@ -57,8 +56,6 @@ int	execute_command(char *full_cmd, t_cmd **list, int outfile)
 		execve(path, arg, environ);
 		exit_command(path, arg);
 	}
-/* 	waitpid(pid, status, 0);
-	*status = get_return_value(status, fdout); */
 	list_add_cmd(list, arg[0], path, pid);
 	if (path)
 		free(path);
@@ -92,7 +89,7 @@ int	get_return_value(int *status, int outfile)
 	if (WIFEXITED(*status))
 		return (WEXITSTATUS(*status));
 	else
-		return (-1);
+		return (0);
 }
 
 /* int	redirect_last_command(char *cmd, int *status, int outfile)
@@ -108,7 +105,23 @@ int	get_return_value(int *status, int outfile)
 	return (0);
 } */
 
-int	redirect_command(char *cmd, int outfile, t_cmd **list)
+int	redirect_last_command(char *cmd, int outfile, t_cmd **list)
+{
+	pid_t	pid;
+
+	pid = fork();
+	if (pid < 0)
+		return (error_msg(FORK));
+	if (pid == 0)
+	{
+		dup2(outfile, 1);
+		close(outfile);
+		execute_command(cmd, list);
+	}
+	return (0);
+}
+
+int	redirect_command(char *cmd, t_cmd **list)
 {
 	pid_t	pid;
 	int		pfd[2];
@@ -123,7 +136,7 @@ int	redirect_command(char *cmd, int outfile, t_cmd **list)
 		close(pfd[0]);
 		dup2(pfd[1], 1);
 		close(pfd[1]);
-		execute_command(cmd, list, outfile);
+		execute_command(cmd, list);
 	}
 	close(pfd[1]);
 	dup2(pfd[0], 0);
@@ -140,20 +153,17 @@ int	pipex(int argc, char **argv, int files[2], t_cmd **list)
 	else
 		i = 2;
 	dup2(files[INFILE], 0);
+	close(files[INFILE]);
 	while (i < argc - 2)
 	{
-		redirect_command(argv[i], files[OUTFILE], list);
+		redirect_command(argv[i], list);
 		i++;
 	}
-	close(files[INFILE]);
+	//close(files[INFILE]);
 	dup2(files[OUTFILE], 1);
 	close(files[OUTFILE]);
 	// regarder iciiiiii
-	execute_command(argv[i], list, files[OUTFILE]);
-/* 	if (!ft_strncmp(argv[1], "here_doc\0", 9))
-		wait_all_pids(argc - 4);
-	else
-		wait_all_pids(argc - 3); */
+	redirect_last_command(argv[i], files[OUTFILE], list);
 	return (close(files[OUTFILE]), 0);
 }
 

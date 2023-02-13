@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 09:47:25 by avast             #+#    #+#             */
-/*   Updated: 2023/02/02 18:23:03 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/13 18:36:38 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,20 +42,23 @@ void	list_add_cmd(t_cmd **list, char *name, char *path, pid_t pid)
 	cur->next = new;
 }
 
-void	wait_all_pids(t_cmd **list)
+int	wait_all_pids(t_cmd **list, int outfile)
 {
 	t_cmd	*cur;
 	int		status;
 
+	status = 0;
 	cur = *list;
 	while (cur->next)
 	{
 		waitpid(cur->pid, NULL, WUNTRACED);
-		printf("%s : error = %d\n", cur->name, cur->error);
+		//printf("%s : error = %d\n", cur->name, cur->error);
 		shell_error_msg(cur->name, cur->error);
 		cur = cur->next;
 	}
 	waitpid(cur->pid, &status, 0);
+	shell_error_msg(cur->name, cur->error);
+	return (get_return_value(&status, outfile));
 }
 
 void	list_free_cmd(t_cmd **list)
