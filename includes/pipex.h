@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:45 by avast             #+#    #+#             */
-/*   Updated: 2023/02/13 18:23:03 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/16 18:33:32 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,6 +64,7 @@ char	*get_command_path(char *command);
 int		get_command_status(char *path, char **arg);
 int		get_infile_fd(int argc, char **argv);
 int		get_outfile_fd(int argc, char **argv);
+int		get_pid_list_size(t_cmd **list);
 int		get_return_value(int *status, int outfile);
 int		heredoc(char *limiter, int argc);
 void	list_add_cmd(t_cmd **list, char *name, char *path, pid_t pid);
@@ -73,6 +74,7 @@ int		redirect_command(char *cmd, t_cmd **list);
 int		redirect_last_command(char *cmd, int outfile, t_cmd **list);
 //int		redirect_last_command(char *cmd, int *status, int outfile);
 int		shell_error_msg(char *cmd, int type);
+int		show_pids(t_cmd **list);
 int		wait_all_pids(t_cmd **list, int oufile);
 
 #endif

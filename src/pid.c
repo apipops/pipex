@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 09:47:25 by avast             #+#    #+#             */
-/*   Updated: 2023/02/13 18:36:38 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/16 18:33:06 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,41 @@ int	wait_all_pids(t_cmd **list, int outfile)
 	waitpid(cur->pid, &status, 0);
 	shell_error_msg(cur->name, cur->error);
 	return (get_return_value(&status, outfile));
+}
+
+int	get_pid_list_size(t_cmd **list)
+{
+	t_cmd	*cur;
+	int		size;
+
+	if (!list)
+		return (0);
+	cur = *list;
+	size = 0;
+	while (cur)
+	{
+		size++;
+		cur = cur->next;
+	}
+	return (size);
+}
+
+int	show_pids(t_cmd **list)
+{
+	t_cmd	*cur;
+	int		i;
+
+	if (list == NULL)
+		ft_printf("PID list nulle\n");
+	cur = *list;
+	i = 0;
+	while (cur)
+	{
+		ft_printf("pid %d (id : %d) = commande %s\n", i, (int)cur->pid, cur->name);
+		cur = cur->next;
+		i++;
+	}
+	return (0);
 }
 
 void	list_free_cmd(t_cmd **list)
