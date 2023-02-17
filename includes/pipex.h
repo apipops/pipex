@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:45 by avast             #+#    #+#             */
-/*   Updated: 2023/02/16 18:33:32 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 11:02:12 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,13 @@ int		check_environment(void);
 int		check_path(void);
 void	display_heredoc(int cmds);
 int		error_msg(int type);
-int		execute_command(char *full_cmd, t_cmd **list);
-int		execute_last_command(char *full_cmd, int *status, int outfile);
+int		execute_command(char *path, char **arg);
+int		execute_last_command(char *full_cmd, t_cmd **list);
 //int		execute_command(char *full_cmd, int fdin, int fdout, int *status);
 //int		execute_last_command(char *full_cmd, int fdin, int fdout, int *status);
 int		exit_command(char *path, char **arg);
 void	free_tab(char **tab, int index);
+void	free_path(char *path, char **arg);
 char	*ft_strjoin_cmd(char const *s1, char const *s2);
 int		ft_strstr(const char *to_find, const char *big);
 char	**get_command_arg(char *cmd);
@@ -69,7 +70,7 @@ int		get_return_value(int *status, int outfile);
 int		heredoc(char *limiter, int argc);
 void	list_add_cmd(t_cmd **list, char *name, char *path, pid_t pid);
 void	list_free_cmd(t_cmd **list);
-int		pipex(int argc, char **argv, int files[2], t_cmd**list);
+int		pipex(int argc, char **argv, int files[2], t_cmd **list);
 int		redirect_command(char *cmd, t_cmd **list);
 int		redirect_last_command(char *cmd, int outfile, t_cmd **list);
 //int		redirect_last_command(char *cmd, int *status, int outfile);

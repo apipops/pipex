@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 22:59:09 by avast             #+#    #+#             */
-/*   Updated: 2023/01/31 16:24:42 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 10:59:58 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,4 +94,11 @@ char	*get_command_path(char *cmd)
 		return (free_tab(path, -1), cmd_path);
 	else
 		return (free_tab(path, -1), free(cmd_path), NULL);
+}
+
+void	free_path(char *path, char **arg)
+{
+	if (path)
+		free(path);
+	free_tab(arg, -1);
 }
