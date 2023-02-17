@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/20 13:06:31 by avast             #+#    #+#             */
-/*   Updated: 2023/02/02 10:04:04 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 12:12:47 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,13 +101,11 @@ int	exit_command(char *path, char **arg)
 {
 	if (path == 0)
 	{
-		//shell_error_msg(arg[0], NO_COMMAND);
 		free_tab(arg, -1);
 		exit (127);
 	}
 	else
 	{
-		//shell_error_msg(arg[0], PERMISSION_DENIED);
 		free_tab(arg, -1);
 		free(path);
 		exit (126);

@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:15 by avast             #+#    #+#             */
-/*   Updated: 2023/02/16 19:31:43 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 12:22:17 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	main(int argc, char **argv)
 		return (-1);
 	if (argc < 5)
 		return (error_msg(ARG));
-	files[INFILE] = get_infile_fd(argc, argv);
+	files[INFILE] = get_infile_fd(argc, argv, &list);
 	files[OUTFILE] = get_outfile_fd(argc, argv);
 	pipex(argc, argv, files, &list);
 	status = wait_all_pids(&list, files[OUTFILE]);
