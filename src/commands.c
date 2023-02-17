@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 01:56:32 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 12:03:27 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 13:05:04 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,6 @@ int	execute_command(char *path, char **arg)
 		execve(path, arg, environ);
 		exit_command(path, arg);
 	}
-	free_path(path, arg);
 	return (0);
 }
 
@@ -71,7 +70,10 @@ int	redirect_command(char *cmd, t_cmd **list)
 	if (pid == 0)
 	{
 		(close(pfd[0]), dup2(pfd[1], 1), close(pfd[1]));
-		execute_command(path, arg);
+		execve(path, arg, environ);
+		exit_command(path, arg);
+		//execute_command(path, arg);
+		//exit(0);
 	}
 	(close(pfd[1]), dup2(pfd[0], 0), close(pfd[0]));
 	list_add_cmd(list, arg[0], path, pid);
@@ -95,5 +97,6 @@ int	pipex(int argc, char **argv, int files[2], t_cmd **list)
 	}
 	dup2(files[OUTFILE], 1);
 	execute_last_command(argv[i], list);
+	//close les pipes
 	return (close(files[OUTFILE]), 0);
 }

@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:15 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 12:22:17 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 13:04:42 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,5 +33,5 @@ int	main(int argc, char **argv)
 		shell_error_msg(argv[argc - 1], PERMISSION_DENIED);
 	if (files[OUTFILE] == FILE_CREATION)
 		shell_error_msg(argv[argc - 1], FILE_CREATION);
-	return (close(files[INFILE]), close(files[INFILE]), status);
+	return (status);
 }
