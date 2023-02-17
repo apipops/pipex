@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 01:56:32 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 13:05:04 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 16:20:03 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,35 @@ int	execute_last_command(char *full_cmd, t_cmd **list)
 	return (0);
 }
 
-int	redirect_command(char *cmd, t_cmd **list)
+int	redirect_fds(int i, t_pipex pipex)
+{
+	if (i == 0)
+		(dup2(pipex.infile, 0), dup2(pipex.pipes[1], 1));
+	else if (i == pipex.nb_cmds - 1)
+		(dup2(pipex.pipes[2 * i - 2], 0), dup2(pipex.outfile, 1));
+	else
+		(dup2(pipex.pipes[2 * i - 2], 0), dup2(pipex.pipes[2 * i + 1], 1));
+	close_pipes(pipex);
+	return (0);
+}
+
+int	close_pipes(t_pipex pipex)
+{
+	int	i;
+
+	i = 0;
+	while (i < pipex.nb_cmds - 1)
+	{
+		close(pipex.pipes[i * 2]);
+		close(pipex.pipes[i * 2 + 1]);
+		i++;
+	}
+	return (0);
+}
+
+int	redirect_command(char *cmd, t_cmd **list, int i, t_pipex pipex)
 {
 	pid_t	pid;
-	int		pfd[2];
 	char	**arg;
 	char	*path;
 
@@ -62,41 +87,32 @@ int	redirect_command(char *cmd, t_cmd **list)
 	if (!arg)
 		return (error_msg(MALLOC));
 	path = get_command_path(arg[0]);
-	if (pipe(pfd) < 0)
-		return (error_msg(PIPE));
 	pid = fork();
 	if (pid < 0)
 		return (error_msg(FORK));
 	if (pid == 0)
 	{
-		(close(pfd[0]), dup2(pfd[1], 1), close(pfd[1]));
+		redirect_fds(i, pipex);
 		execve(path, arg, environ);
 		exit_command(path, arg);
-		//execute_command(path, arg);
-		//exit(0);
 	}
-	(close(pfd[1]), dup2(pfd[0], 0), close(pfd[0]));
 	list_add_cmd(list, arg[0], path, pid);
 	return (free_path(path, arg), 0);
 }
 
-int	pipex(int argc, char **argv, int files[2], t_cmd **list)
+int	f_pipex(int argc, char **argv, t_pipex pipex, t_cmd **list)
 {
 	int		i;
 
-	if (!ft_strncmp(argv[1], "here_doc\0", 9))
-		i = 3;
-	else
-		i = 2;
-	dup2(files[INFILE], 0);
-	close(files[INFILE]);
-	while (i < argc - 2)
+	i = pipex.first_cmd;
+/* 	dup2(pipex.infile, 0);
+	close(pipex.infile); */
+	while (i < argc - 1)
 	{
-		redirect_command(argv[i], list);
+		//ft_printf("i = %d\n", i - pipex.first_cmd);
+		redirect_command(argv[i], list, i - pipex.first_cmd, pipex);
 		i++;
 	}
-	dup2(files[OUTFILE], 1);
-	execute_last_command(argv[i], list);
-	//close les pipes
-	return (close(files[OUTFILE]), 0);
+	close_pipes(pipex);
+	return (0);
 }
