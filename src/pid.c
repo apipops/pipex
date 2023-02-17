@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 09:47:25 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 12:18:39 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 17:29:20 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,12 +21,12 @@ int	list_create_elem(t_cmd *new, char *name, char *path, pid_t pid)
 	(*new).next = NULL;
 	if (pid == NO_FILE)
 		(*new).error = NO_FILE;
+	else if (path == NULL)
+		(*new).error = NO_COMMAND;
 	else if (access(path, X_OK) == 0)
 		(*new).error = NO_ERROR;
 	else if (access(path, F_OK) == 0)
 		(*new).error = PERMISSION_DENIED;
-	else
-		(*new).error = NO_COMMAND;
 	return (0);
 }
 
@@ -52,13 +52,14 @@ int	list_add_cmd(t_cmd **list, char *name, char *path, pid_t pid)
 	return (0);
 }
 
-int	wait_all_pids(t_cmd **list, int outfile)
+int	wait_all_pids(t_cmd **list, t_pipex pipex)
 {
 	t_cmd	*cur;
 	int		status;
 
 	status = 0;
 	cur = *list;
+	close_pipes(pipex);
 	while (cur->next)
 	{
 		if (cur->pid > 0)
@@ -70,7 +71,7 @@ int	wait_all_pids(t_cmd **list, int outfile)
 	}
 	waitpid(cur->pid, &status, 0);
 	shell_error_msg(cur->name, cur->error);
-	return (get_return_value(&status, outfile));
+	return (get_return_value(&status, pipex.outfile));
 }
 
 void	list_free_cmd(t_cmd **list)
@@ -89,22 +90,6 @@ void	list_free_cmd(t_cmd **list)
 			free(tmp->path);
 		free(tmp);
 	}
-}
-
-int	show_pids(t_cmd	**list)
-{
-	t_cmd	*cur;
-	int		i;
-
-	i = 1;
-	cur = *list;
-	while (cur)
-	{
-		ft_printf("Cmd #%d : %s (pid = %d, error = %d)\n", i, cur->name, cur->pid, cur->error);
-		i++;
-		cur = cur->next;
-	}
-	return (0);
 }
 
 int	get_return_value(int *status, int outfile)

@@ -6,30 +6,12 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:15 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 15:50:09 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 17:29:46 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 #include "../libft/libft.h"
-
-int	*create_pipes(int nb_cmds)
-{
-	int	i;
-	int	*pipes;
-
-	pipes = malloc((nb_cmds - 1) * sizeof(int) * 2);
-	if (!pipes)
-		return (NULL);
-	i = 0;
-	while (i < nb_cmds - 1)
-	{
-		if (pipe(pipes + (i * 2)) < 0)
-			return (error_msg(PIPE), free(pipes), NULL);
-		i++;
-	}
-	return (pipes);
-}
 
 int	get_pipex_infos(int argc, char **argv, t_pipex *pipex, t_cmd **list)
 {
@@ -58,16 +40,23 @@ int	main(int argc, char **argv)
 	int		status;
 	t_pipex	pipex;
 	t_cmd	*list;
+	int		i;
 
 	list = NULL;
 	if (check_environment() < 0)
 		return (-1);
 	if (argc < 5)
 		return (error_msg(ARG));
-	get_pipex_infos(argc, argv, &pipex, &list);
-	f_pipex(argc, argv, pipex, &list);
-	status = wait_all_pids(&list, pipex.outfile);
-	list_free_cmd(&list);
+	if (get_pipex_infos(argc, argv, &pipex, &list) == -1)
+		return (-1);
+	i = pipex.first_cmd;
+	while (i < argc - 1)
+	{
+		execute_command(argv[i], &list, i - pipex.first_cmd, pipex);
+		i++;
+	}
+	status = wait_all_pids(&list, pipex);
+	(list_free_cmd(&list), free(pipex.pipes));
 	if (pipex.outfile == PERMISSION_DENIED)
 		shell_error_msg(argv[argc - 1], PERMISSION_DENIED);
 	if (pipex.outfile == FILE_CREATION)

@@ -6,7 +6,7 @@
 #    By: avast <avast@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/10 11:41:55 by avast             #+#    #+#              #
-#    Updated: 2023/02/02 10:07:46 by avast            ###   ########.fr        #
+#    Updated: 2023/02/17 17:08:26 by avast            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -16,7 +16,7 @@ SRC = src/main.c \
 	src/errors.c \
 	src/files.c \
 	src/path.c \
-	src/commands.c \
+	src/pipes.c \
 	src/pid.c
 
 OBJ = $(SRC:.c=.o)

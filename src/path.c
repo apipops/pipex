@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 22:59:09 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 10:59:58 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 16:53:58 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,18 +39,6 @@ char	*ft_strjoin_cmd(char const *s1, char const *s2)
 	}
 	str[i] = '\0';
 	return (str);
-}
-
-int	ft_strstr(const char *to_find, const char *big)
-{
-	size_t	i;
-
-	i = 0;
-	while (to_find[i] && big[i] && to_find[i] == big[i])
-		i++;
-	if (!to_find[i])
-		return (1);
-	return (0);
 }
 
 int	check_path(void)

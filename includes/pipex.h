@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:45 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 14:36:37 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 17:41:32 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 # define MALLOC -9
 # define FILE_CREATION -10
 # define ERROR -11
+# define DUP2 -12
 # define EXECVE 127
 
 extern char	**environ;
@@ -51,7 +52,7 @@ typedef struct s_cmd
 typedef struct s_pipex
 {
 	int		argc;
-	char 	**argv;
+	char	**argv;
 	int		nb_cmds;
 	int		infile;
 	int		outfile;
@@ -61,41 +62,27 @@ typedef struct s_pipex
 
 int		check_environment(void);
 int		check_path(void);
+int		close_pipes(t_pipex pipex);
 int		*create_pipes(int nb_cmds);
 void	display_heredoc(int cmds);
 int		error_msg(int type);
-int		execute_command(char *path, char **arg);
-int		execute_last_command(char *full_cmd, t_cmd **list);
-//int		execute_command(char *full_cmd, int fdin, int fdout, int *status);
-//int		execute_last_command(char *full_cmd, int fdin, int fdout, int *status);
-int		exit_command(char *path, char **arg);
+int		execute_command(char *cmd, t_cmd **list, int i, t_pipex pipex);
+int		exit_command(char *path, char **arg, t_cmd **list, t_pipex pipex);
 void	free_tab(char **tab, int index);
 void	free_path(char *path, char **arg);
 char	*ft_strjoin_cmd(char const *s1, char const *s2);
-int		ft_strstr(const char *to_find, const char *big);
 char	**get_command_arg(char *cmd);
 char	*get_command_path(char *command);
-int		get_command_status(char *path, char **arg);
 int		get_infile_fd(int argc, char **argv, t_cmd **list);
 int		get_outfile_fd(int argc, char **argv);
-int		get_pid_list_size(t_cmd **list);
 int		get_pipex_infos(int argc, char **argv, t_pipex *pipex, t_cmd **list);
 int		get_return_value(int *status, int outfile);
 int		heredoc(char *limiter, int argc);
 int		list_add_cmd(t_cmd **list, char *name, char *path, pid_t pid);
 int		list_create_elem(t_cmd *new, char *name, char *path, pid_t pid);
 void	list_free_cmd(t_cmd **list);
-int		f_pipex(int argc, char **argv, t_pipex pipex, t_cmd **list);
-//int		redirect_command(char *cmd, t_cmd **list);
-int		redirect_command(char *cmd, t_cmd **list, int i, t_pipex pipex);
-int		redirect_last_command(char *cmd, int outfile, t_cmd **list);
-//int		redirect_last_command(char *cmd, int *status, int outfile);
-int		shell_error_msg(char *cmd, int type);
-int		show_pids(t_cmd **list);
-int		wait_all_pids(t_cmd **list, int oufile);
-int		close_pipes(t_pipex pipex);
 int		redirect_fds(int i, t_pipex pipex);
-int		get_pipex_infos(int argc, char **argv, t_pipex *pipex, t_cmd **list);
-int		*create_pipes(int nb_cmds);
+int		shell_error_msg(char *cmd, int type);
+int		wait_all_pids(t_cmd **list, t_pipex pipex);
 
 #endif

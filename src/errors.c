@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/20 13:06:31 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 12:12:47 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/17 17:38:43 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	check_environment(void)
 		else
 			i++;
 	}
-	return (-1);
+	return (ft_putstr_fd("environment error: no shell\n", 2), -1);
 }
 
 void	free_tab(char **tab, int index)
@@ -66,6 +66,8 @@ int	error_msg(int type)
 		ft_putstr_fd("fork failed\n", 2);
 	if (type == MALLOC)
 		ft_putstr_fd("malloc failed\n", 2);
+	if (type == DUP2)
+		ft_putstr_fd("dup2 failed\n", 2);
 	return (-1);
 }
 
@@ -97,17 +99,21 @@ int	shell_error_msg(char *cmd, int type)
 	return (-1);
 }
 
-int	exit_command(char *path, char **arg)
+int	exit_command(char *path, char **arg, t_cmd **list, t_pipex pipex)
 {
 	if (path == 0)
 	{
 		free_tab(arg, -1);
+		free(pipex.pipes);
+		list_free_cmd(list);
 		exit (127);
 	}
 	else
 	{
 		free_tab(arg, -1);
 		free(path);
+		free(pipex.pipes);
+		list_free_cmd(list);
 		exit (126);
 	}
 }
