@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/20 13:06:31 by avast             #+#    #+#             */
-/*   Updated: 2023/02/20 15:42:33 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/20 16:03:23 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,8 +88,7 @@ int	shell_error_msg(char *cmd, int type)
 	}
 	while (environ[i] && !ft_strstr("SHELL=/bin/\0", environ[i]))
 		i++;
-	if (check_path())
-		ft_putstr_fd(environ[i] + 11, 2);
+	ft_putstr_fd(environ[i] + 11, 2);
 	if (type == NO_COMMAND)
 		ft_putstr_fd(": command not found: ", 2);
 	if (type == NO_FILE)
