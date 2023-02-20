@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 00:14:08 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 12:21:49 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/20 15:17:49 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	heredoc(char *limiter, int argc)
 		free(new_limiter), pfd[0]);
 }
 
-int	get_infile_fd(int argc, char **argv, t_cmd **list)
+int	get_infile_fd(int argc, char **argv)
 {
 	int	infile;
 
@@ -57,11 +57,7 @@ int	get_infile_fd(int argc, char **argv, t_cmd **list)
 		if (infile == -1 && access(argv[1], F_OK) == 0)
 			return (shell_error_msg(argv[1], PERMISSION_DENIED));
 		else if (infile == -1 && access(argv[1], F_OK) == -1)
-		{
-			infile = open(argv[1], O_RDONLY | O_CREAT, 444);
-			list_add_cmd(list, argv[1], NULL, NO_FILE);
-			return (infile);
-		}
+			return (shell_error_msg(argv[1], NO_FILE));
 	}
 	return (infile);
 }
@@ -74,9 +70,7 @@ int	get_outfile_fd(int argc, char **argv)
 		outfile = open(argv[argc - 1], O_RDWR | O_CREAT | O_APPEND, 0644);
 	else
 		outfile = open(argv[argc - 1], O_RDWR | O_CREAT | O_TRUNC, 0644);
-	if (outfile == -1 && access(argv[argc - 1], F_OK) == 0)
+	if (outfile == -1)
 		return (PERMISSION_DENIED);
-	else if (outfile == -1)
-		return (FILE_CREATION);
 	return (outfile);
 }

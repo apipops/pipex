@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:45 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 17:41:32 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/20 15:20:35 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,8 @@
 # define FORK -8
 # define MALLOC -9
 # define FILE_CREATION -10
-# define ERROR -11
+# define CLOSE -11
 # define DUP2 -12
-# define EXECVE 127
 
 extern char	**environ;
 
@@ -58,6 +57,7 @@ typedef struct s_pipex
 	int		outfile;
 	int		*pipes;
 	int		first_cmd;
+	t_cmd	**errors;
 }	t_pipex;
 
 int		check_environment(void);
@@ -67,21 +67,22 @@ int		*create_pipes(int nb_cmds);
 void	display_heredoc(int cmds);
 int		error_msg(int type);
 int		execute_command(char *cmd, t_cmd **list, int i, t_pipex pipex);
+int		exit_and_free(int type, t_pipex pipex);
 int		exit_command(char *path, char **arg, t_cmd **list, t_pipex pipex);
 void	free_tab(char **tab, int index);
 void	free_path(char *path, char **arg);
 char	*ft_strjoin_cmd(char const *s1, char const *s2);
 char	**get_command_arg(char *cmd);
 char	*get_command_path(char *command);
-int		get_infile_fd(int argc, char **argv, t_cmd **list);
+int		get_infile_fd(int argc, char **argv);
 int		get_outfile_fd(int argc, char **argv);
 int		get_pipex_infos(int argc, char **argv, t_pipex *pipex, t_cmd **list);
 int		get_return_value(int *status, int outfile);
 int		heredoc(char *limiter, int argc);
 int		list_add_cmd(t_cmd **list, char *name, char *path, pid_t pid);
 int		list_create_elem(t_cmd *new, char *name, char *path, pid_t pid);
-void	list_free_cmd(t_cmd **list);
-int		redirect_fds(int i, t_pipex pipex);
+void	free_cmd(t_cmd **list);
+int		redirect_fds(int i, t_pipex pipex, char *path, char **arg);
 int		shell_error_msg(char *cmd, int type);
 int		wait_all_pids(t_cmd **list, t_pipex pipex);
 

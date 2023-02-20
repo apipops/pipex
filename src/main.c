@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/10 11:55:15 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 17:29:46 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/20 15:17:57 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ int	get_pipex_infos(int argc, char **argv, t_pipex *pipex, t_cmd **list)
 {
 	pipex->argc = argc;
 	pipex->argv = argv;
-	pipex->infile = get_infile_fd(argc, argv, list);
+	pipex->infile = get_infile_fd(argc, argv);
 	pipex->outfile = get_outfile_fd(argc, argv);
 	if (!ft_strncmp(argv[1], "here_doc\0", 9))
 	{
@@ -29,9 +29,10 @@ int	get_pipex_infos(int argc, char **argv, t_pipex *pipex, t_cmd **list)
 		pipex->first_cmd = 2;
 		pipex->nb_cmds = argc - 3;
 	}
+	pipex->errors = list;
 	pipex->pipes = create_pipes(pipex->nb_cmds);
 	if (!pipex->pipes)
-		return (-1);
+		return (free_cmd(list), -1);
 	return (0);
 }
 
@@ -55,11 +56,9 @@ int	main(int argc, char **argv)
 		execute_command(argv[i], &list, i - pipex.first_cmd, pipex);
 		i++;
 	}
+	close_pipes(pipex);
 	status = wait_all_pids(&list, pipex);
-	(list_free_cmd(&list), free(pipex.pipes));
-	if (pipex.outfile == PERMISSION_DENIED)
-		shell_error_msg(argv[argc - 1], PERMISSION_DENIED);
-	if (pipex.outfile == FILE_CREATION)
-		shell_error_msg(argv[argc - 1], FILE_CREATION);
+	free_cmd(&list);
+	free(pipex.pipes);
 	return (status);
 }

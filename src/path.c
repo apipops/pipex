@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 22:59:09 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 16:53:58 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/20 15:50:50 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,9 +63,9 @@ char	*get_command_path(char *cmd)
 	int		i;
 
 	i = check_path();
-	if (i < 0)
+	if (!cmd)
 		return (NULL);
-	if (cmd[0] == '/' || cmd[0] == '.' || cmd[0] == '~')
+	if (i < 0 || cmd[0] == '/' || cmd[0] == '.' || cmd[0] == '~')
 		return (ft_strdup(cmd));
 	path = ft_split((environ[i] + 5), ':');
 	i = 0;

@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/20 13:06:31 by avast             #+#    #+#             */
-/*   Updated: 2023/02/17 17:38:43 by avast            ###   ########.fr       */
+/*   Updated: 2023/02/20 15:42:33 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,8 @@ int	error_msg(int type)
 		ft_putstr_fd("malloc failed\n", 2);
 	if (type == DUP2)
 		ft_putstr_fd("dup2 failed\n", 2);
+	if (type == CLOSE)
+		ft_putstr_fd("close failed\n", 2);
 	return (-1);
 }
 
@@ -81,39 +83,31 @@ int	shell_error_msg(char *cmd, int type)
 	if (type == FILE_CREATION)
 	{
 		ft_putstr_fd("file creation failed: ", 2),
-		ft_putstr_fd(cmd, 2);
-		ft_putstr_fd("\n", 2);
+		(ft_putstr_fd(cmd, 2), ft_putstr_fd("\n", 2));
 		return (-1);
 	}
 	while (environ[i] && !ft_strstr("SHELL=/bin/\0", environ[i]))
 		i++;
-	ft_putstr_fd(environ[i] + 11, 2);
+	if (check_path())
+		ft_putstr_fd(environ[i] + 11, 2);
 	if (type == NO_COMMAND)
 		ft_putstr_fd(": command not found: ", 2);
 	if (type == NO_FILE)
 		ft_putstr_fd(": no such file or directory: ", 2);
 	if (type == PERMISSION_DENIED)
 		ft_putstr_fd(": permission denied: ", 2);
-	ft_putstr_fd(cmd, 2);
-	ft_putstr_fd("\n", 2);
+	if (!cmd)
+		ft_putstr_fd("(null)", 2);
+	(ft_putstr_fd(cmd, 2), ft_putstr_fd("\n", 2));
 	return (-1);
 }
 
-int	exit_command(char *path, char **arg, t_cmd **list, t_pipex pipex)
+int	exit_and_free(int type, t_pipex pipex)
 {
-	if (path == 0)
-	{
-		free_tab(arg, -1);
-		free(pipex.pipes);
-		list_free_cmd(list);
-		exit (127);
-	}
-	else
-	{
-		free_tab(arg, -1);
-		free(path);
-		free(pipex.pipes);
-		list_free_cmd(list);
-		exit (126);
-	}
+	error_msg(type);
+	close_pipes(pipex);
+	free_cmd(pipex.errors);
+	free(pipex.pipes);
+	exit (-1);
+	return (-1);
 }
