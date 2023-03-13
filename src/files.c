@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 00:14:08 by avast             #+#    #+#             */
-/*   Updated: 2023/02/20 15:17:49 by avast            ###   ########.fr       */
+/*   Updated: 2023/03/13 11:27:43 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ int	heredoc(char *limiter, int argc)
 		free(new_limiter), pfd[0]);
 }
 
-int	get_infile_fd(int argc, char **argv)
+int	get_infile_fd(int argc, char **argv, char **envp)
 {
 	int	infile;
 
@@ -55,9 +55,9 @@ int	get_infile_fd(int argc, char **argv)
 	{
 		infile = open(argv[1], O_RDONLY);
 		if (infile == -1 && access(argv[1], F_OK) == 0)
-			return (shell_error_msg(argv[1], PERMISSION_DENIED));
+			return (shell_error_msg(argv[1], PERMISSION_DENIED, envp));
 		else if (infile == -1 && access(argv[1], F_OK) == -1)
-			return (shell_error_msg(argv[1], NO_FILE));
+			return (shell_error_msg(argv[1], NO_FILE, envp));
 	}
 	return (infile);
 }

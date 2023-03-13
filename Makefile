@@ -6,18 +6,18 @@
 #    By: avast <avast@student.42.fr>                +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/10 11:41:55 by avast             #+#    #+#              #
-#    Updated: 2023/02/17 17:08:26 by avast            ###   ########.fr        #
+#    Updated: 2023/03/13 11:30:08 by avast            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = pipex
 
-SRC = src/main.c \
-	src/errors.c \
+SRC = src/errors.c \
 	src/files.c \
+	src/main.c \
 	src/path.c \
+	src/pid.c \
 	src/pipes.c \
-	src/pid.c
 
 OBJ = $(SRC:.c=.o)
 
@@ -47,7 +47,7 @@ all: $(NAME)
 	@$(CC) $(FLAGS) -I./includes -I./libft -c $< -o $@
 
 $(NAME): $(OBJ) $(LIBFT) $(INCLUDES)
-	@$(CC) $(OBJ) -L$(LIBFTDIR) -g3 -lft -o $(NAME)
+	@$(CC) $(OBJ) -L$(LIBFTDIR) -lreadline -g3 -lft -o $(NAME)
 	@printf "$(YELLOW)------Compilation executed------\n\n"
 
 $(LIBFT):

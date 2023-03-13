@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/30 22:59:09 by avast             #+#    #+#             */
-/*   Updated: 2023/02/20 15:50:50 by avast            ###   ########.fr       */
+/*   Updated: 2023/03/13 11:27:43 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	*ft_strjoin_cmd(char const *s1, char const *s2)
 	return (str);
 }
 
-int	check_path(void)
+int	check_path(char **environ)
 {
 	int	i;
 
@@ -56,13 +56,13 @@ int	check_path(void)
 	return (-1);
 }
 
-char	*get_command_path(char *cmd)
+char	*get_command_path(char *cmd, char **environ)
 {
 	char	**path;
 	char	*cmd_path;
 	int		i;
 
-	i = check_path();
+	i = check_path(environ);
 	if (!cmd)
 		return (NULL);
 	if (i < 0 || cmd[0] == '/' || cmd[0] == '.' || cmd[0] == '~')
@@ -77,16 +77,16 @@ char	*get_command_path(char *cmd)
 		cmd_path = ft_strjoin_cmd(path[i], cmd);
 	}
 	if (access(cmd_path, X_OK) == 0)
-		return (free_tab(path, -1), cmd_path);
+		return (ft_free_chartab(path, -1), cmd_path);
 	else if (access(cmd_path, F_OK) == 0)
-		return (free_tab(path, -1), cmd_path);
+		return (ft_free_chartab(path, -1), cmd_path);
 	else
-		return (free_tab(path, -1), free(cmd_path), NULL);
+		return (ft_free_chartab(path, -1), free(cmd_path), NULL);
 }
 
 void	free_path(char *path, char **arg)
 {
 	if (path)
 		free(path);
-	free_tab(arg, -1);
+	ft_free_chartab(arg, -1);
 }

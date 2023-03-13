@@ -6,14 +6,14 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/20 13:06:31 by avast             #+#    #+#             */
-/*   Updated: 2023/02/20 16:03:23 by avast            ###   ########.fr       */
+/*   Updated: 2023/03/13 11:27:43 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 #include "../libft/libft.h"
 
-int	check_environment(void)
+int	check_environment(char **environ)
 {
 	int	i;
 
@@ -28,30 +28,6 @@ int	check_environment(void)
 			i++;
 	}
 	return (ft_putstr_fd("environment error: no shell\n", 2), -1);
-}
-
-void	free_tab(char **tab, int index)
-{
-	int	i;
-
-	i = 0;
-	if (index < 0)
-	{
-		while (tab[i])
-		{
-			free(tab[i]);
-			i++;
-		}
-	}
-	else
-	{
-		while (index >= 0)
-		{
-			free(tab[index]);
-			index--;
-		}
-	}
-	free(tab);
 }
 
 int	error_msg(int type)
@@ -73,7 +49,7 @@ int	error_msg(int type)
 	return (-1);
 }
 
-int	shell_error_msg(char *cmd, int type)
+int	shell_error_msg(char *cmd, int type, char **environ)
 {
 	int	i;
 
@@ -106,7 +82,6 @@ int	exit_and_free(int type, t_pipex pipex)
 	error_msg(type);
 	close_pipes(pipex);
 	free_cmd(pipex.errors);
-	free(pipex.pipes);
 	exit (-1);
 	return (-1);
 }

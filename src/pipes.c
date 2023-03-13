@@ -6,34 +6,16 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/24 01:56:32 by avast             #+#    #+#             */
-/*   Updated: 2023/02/20 15:41:43 by avast            ###   ########.fr       */
+/*   Updated: 2023/03/13 11:27:43 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/pipex.h"
 #include "../libft/libft.h"
 
-int	*create_pipes(int nb_cmds)
-{
-	int	i;
-	int	*pipes;
-
-	pipes = malloc((nb_cmds - 1) * sizeof(int) * 2);
-	if (!pipes)
-		return (error_msg(MALLOC), NULL);
-	i = 0;
-	while (i < nb_cmds - 1)
-	{
-		if (pipe(pipes + (i * 2)) < 0)
-			return (error_msg(PIPE), free(pipes), NULL);
-		i++;
-	}
-	return (pipes);
-}
-
 int	redirect_fds(int i, t_pipex pipex, char *path, char **arg)
 {
-	if (i == 0)
+	if (i == 1)
 	{
 		if ((dup2(pipex.infile, 0) < 0 && pipex.infile > 0)
 			|| dup2(pipex.pipes[1], 1) < 0)
@@ -41,9 +23,9 @@ int	redirect_fds(int i, t_pipex pipex, char *path, char **arg)
 		if (pipex.infile < 0)
 			return (free_path(path, arg), exit_and_free(0, pipex));
 	}
-	else if (i == pipex.nb_cmds - 1)
+	else if (i == pipex.nb_cmds)
 	{
-		if (dup2(pipex.pipes[2 * i - 2], 0) < 0
+		if (dup2(pipex.last_pipes[0], 0) < 0
 			|| (pipex.outfile > 0 && dup2(pipex.outfile, 1) < 0))
 			return (free_path(path, arg), exit_and_free(DUP2, pipex));
 		if (pipex.outfile < 0)
@@ -51,26 +33,22 @@ int	redirect_fds(int i, t_pipex pipex, char *path, char **arg)
 	}
 	else
 	{
-		if (dup2(pipex.pipes[2 * i - 2], 0) < 0
-			|| dup2(pipex.pipes[2 * i + 1], 1) < 0)
+		if (dup2(pipex.last_pipes[0], 0) < 0 || dup2(pipex.pipes[1], 1) < 0)
 			return (free_path(path, arg), exit_and_free(DUP2, pipex));
 	}
-	close_pipes(pipex);
-	return (0);
+	return (close_pipes(pipex), 0);
 }
 
 int	close_pipes(t_pipex pipex)
 {
-	int	i;
-
-	i = 0;
-	while (i < pipex.nb_cmds - 1)
-	{
-		if (close(pipex.pipes[i * 2]) == 1
-			|| close(pipex.pipes[i * 2 + 1]) == -1)
-			return (exit_and_free(CLOSE, pipex));
-		i++;
-	}
+	if (pipex.pipes[0] > 0)
+		close(pipex.pipes[0]);
+	if (pipex.pipes[1] > 0)
+		close(pipex.pipes[1]);
+	if (pipex.last_pipes[0] > 0)
+		close(pipex.last_pipes[0]);
+	if (pipex.last_pipes[1] > 0)
+		close(pipex.last_pipes[1]);
 	if (pipex.infile >= 0)
 	{
 		if (close(pipex.infile) == -1)
@@ -84,28 +62,43 @@ int	close_pipes(t_pipex pipex)
 	return (0);
 }
 
-int	exit_command(char *path, char **arg, t_cmd **list, t_pipex pipex)
+int	exit_command(char *path, char **arg, t_pipex pipex)
 {
 	if (path == 0 || access(path, F_OK) == -1)
 	{
-		free_tab(arg, -1);
+		ft_free_chartab(arg, -1);
 		if (path)
 			free(path);
-		free(pipex.pipes);
-		free_cmd(list);
+		free_cmd(pipex.errors);
 		exit (127);
 	}
 	else
 	{
-		free_tab(arg, -1);
+		ft_free_chartab(arg, -1);
 		free(path);
-		free(pipex.pipes);
-		free_cmd(list);
+		free_cmd(pipex.errors);
 		exit (126);
 	}
 }
 
-int	execute_command(char *cmd, t_cmd **list, int i, t_pipex pipex)
+int	update_pipes(t_pipex *pipex, int i)
+{
+	if (pipex->last_pipes[0] > 0)
+		close(pipex->last_pipes[0]);
+	pipex->last_pipes[0] = pipex->pipes[0];
+	pipex->last_pipes[1] = pipex->pipes[1];
+	close(pipex->last_pipes[1]);
+	pipex->pipes[0] = -1;
+	pipex->pipes[0] = -1;
+	if (i < pipex->nb_cmds - 1)
+	{
+		if (pipe(pipex->pipes) == -1)
+			return (exit_and_free(PIPE, *pipex));
+	}
+	return (0);
+}
+
+int	execute_command(char *cmd, int i, t_pipex *pipex)
 {
 	pid_t	pid;
 	char	**arg;
@@ -113,21 +106,22 @@ int	execute_command(char *cmd, t_cmd **list, int i, t_pipex pipex)
 
 	arg = ft_split(cmd, 32);
 	if (!arg)
-		return (exit_and_free(MALLOC, pipex));
-	path = get_command_path(arg[0]);
+		return (exit_and_free(MALLOC, *pipex));
+	path = get_command_path(arg[0], pipex->envp);
 	pid = fork();
 	if (pid < 0)
 	{
 		free_path(path, arg);
-		return (exit_and_free(FORK, pipex));
+		return (exit_and_free(FORK, *pipex));
 	}
 	if (pid == 0)
 	{
-		redirect_fds(i, pipex, path, arg);
+		redirect_fds(i, *pipex, path, arg);
 		if (path)
-			execve(path, arg, environ);
-		exit_command(path, arg, list, pipex);
+			execve(path, arg, pipex->envp);
+		exit_command(path, arg, *pipex);
 	}
-	list_add_cmd(list, arg[0], path, pid);
+	list_add_cmd(pipex->errors, arg[0], path, pid);
+	update_pipes(pipex, i);
 	return (free_path(path, arg), 0);
 }

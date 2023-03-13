@@ -6,7 +6,7 @@
 /*   By: avast <avast@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/02 09:47:25 by avast             #+#    #+#             */
-/*   Updated: 2023/02/20 15:49:30 by avast            ###   ########.fr       */
+/*   Updated: 2023/03/13 11:27:43 by avast            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,13 +62,14 @@ int	wait_all_pids(t_cmd **list, t_pipex pipex)
 	while (cur->next)
 	{
 		waitpid(cur->pid, NULL, 0);
-		shell_error_msg(cur->name, cur->error);
+		shell_error_msg(cur->name, cur->error, pipex.envp);
 		cur = cur->next;
 	}
 	waitpid(cur->pid, &status, 0);
-	shell_error_msg(cur->name, cur->error);
+	shell_error_msg(cur->name, cur->error, pipex.envp);
 	if (pipex.outfile == PERMISSION_DENIED)
-		shell_error_msg(pipex.argv[pipex.argc - 1], PERMISSION_DENIED);
+		shell_error_msg(pipex.argv[pipex.argc - 1],
+			PERMISSION_DENIED, pipex.envp);
 	return (get_return_value(&status, pipex.outfile));
 }
 
